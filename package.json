@@ -1,0 +1,21 @@
+{
+  "name": "ucr",
+  "version": "1.0.0",
+  "description": "discord bot",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node start.js"
+  },
+  "keywords": [
+    "ucr"
+  ],
+  "engines": {
+    "node": "12.x"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "discord.js": "^12.0.1",
+    "dotenv": "^8.2.0"
+  }
+}
