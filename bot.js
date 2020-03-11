@@ -1,48 +1,51 @@
-﻿const Discord = require('discord.js');
+const Discord = require('discord.js');
 const dotenv = require("dotenv");
+const fs = require('fs');
 const util = require('util');
 dotenv.config({ path: __dirname + "/.env" });
 const client = new Discord.Client();
+var guildId = 0;
+var rrId = 0;
 var messageId = 0;
 var verifyId = 0;
 var cleanId = 0;
 async function counter(guild) {
-    if (guild.channels.cache.find(async x => x.name.startsWith('유저 수 | Users'))) {
-        await guild.channels.cache.find(async x => x.name.startsWith('유저 수 | Users')).delete();
+    if (guild.channels.cache.find(x => x.name.startsWith('Users'))) {
+        await guild.channels.cache.find(x => x.name.startsWith('Users')).delete();
     }
-    if (guild.channels.cache.find(async x => x.name.startsWith('전체 유저 수 | All Members'))) {
-        await guild.channels.cache.find(async x => x.name.startsWith('전체 유저 수 | All Members')).delete();
+    if (guild.channels.cache.find(x => x.name.startsWith('All Members'))) {
+        await guild.channels.cache.find(x => x.name.startsWith('All Members')).delete();
     }
-    if (guild.channels.cache.find(async x => x.name.startsWith('봇 수 | Bots'))) {
-        await guild.channels.cache.find(async x => x.name.startsWith('봇 수 | Bots')).delete();
+    if (guild.channels.cache.find(x => x.name.startsWith('Bots'))) {
+        await guild.channels.cache.find(x => x.name.startsWith('Bots')).delete();
     }
-    if (guild.channels.cache.find(async x => x.name === 'UCR 유저 현황 | UCR User Status')) {
-        await guild.channels.cache.find(async x => x.name === 'UCR 유저 현황 | UCR User Status').delete();
+    if (guild.channels.cache.find(x => x.name === 'UCR User Status')) {
+        await guild.channels.cache.find(x => x.name === 'UCR User Status').delete();
     }
-    await guild.channels.create('UCR 유저 현황 | UCR User Status', {
+    await guild.channels.create('UCR User Status', {
         type: 'category'
-    }).then(async c => {
-        await guild.channels.create('전체 유저 수 | All Members:' + guild.memberCount, {
+    }).then(c => {
+        guild.channels.create('All Members:' + guild.memberCount, {
             type: "voice",
             parent: c.id
         });
         var user = 0;
-        await guild.members.cache.forEach(async x => {
+        guild.members.cache.forEach(x => {
             if (!x.user.bot) {
                 user++
             }
         });
-        await guild.channels.create('유저 수 | Users:' + user, {
+        guild.channels.create('Users:' + user, {
             type: "voice",
             parent: c.id
         });
         var bot = 0;
-        await guild.members.cache.forEach(async x => {
+        guild.members.cache.forEach(x => {
             if (x.user.bot) {
                 bot++
             }
         });
-        await guild.channels.create('봇 수 | Bots:' + bot, {
+        guild.channels.create('Bots:' + bot, {
             type: "voice",
             parent: c.id
         });
@@ -78,7 +81,7 @@ async function type(text) {
 }
 client.on('ready', async () => {
     await console.log(`${client.user.tag}로 로그인됨`);
-    if (!client.guilds.cache.get('632536162770354186')) return;
+    if (!client.guilds.cache.get(guildId)) return;
     await client.user.setPresence({
         status: "online",
         activities: {
@@ -92,21 +95,21 @@ client.on('ready', async () => {
         .setThumbnail('https://cdn.discordapp.com/icons/632536162770354186/a_1f326648cc72d4c84985ac3f7dd68a61.jpg')
         .setDescription('1️⃣: 슷칼봇을 한다(SkileBot)\n2️⃣: 배추봇, 마이펫을 한다(Cabbage Bot & My Pet)\n3️⃣: 엔트리를 한다(Entry)\n4️⃣: 스크래치를 한다(Scratch)\n5️⃣: 디스코드 봇 프로그래밍을 한다(Discord bot programming)\n6️⃣: 구독자(Subscribers)\n')
         .setColor(0x00ffff)
-        .setFooter('UCR(User Communication Room)', client.guilds.cache.get('632536162770354186').iconURL({
+        .setFooter('UCR(User Communication Room)', client.guilds.cache.get(guildId).iconURL({
             dynamic: true
         }))
         .setTimestamp()
     const imbed = new Discord.MessageEmbed()
         .setTitle('규칙 | Rule')
         .setThumbnail('https://cdn.discordapp.com/icons/632536162770354186/a_1f326648cc72d4c84985ac3f7dd68a61.jpg')
-        .setDescription('환영합니다!\n본 서버는 그냥 자유롭게 아무 애기나 하셔도 되구요,\n2가지 규칙만 지키시면 됩니다.\n1.욕 금지\n2.기본 매너 지키기\n이것만 지키심 되구, 모든 서버는 자유롭게 이용하실수 있습니다\n따로 궁금하거나 뭘 만들어 달라는 제보는 관리자 한테 해주세요\n감사합니다\n이 모든 것을 동의하면 이 아래에 있는 ✅ 를 눌러주세요!\n\n\nWelcome!\nIn this server you can talk anything about it,\nbut you have to obey just 2 rules!\n1.No cursing\n2.Keep basic manners\nIf you obey this rules than you can chat in this room freely!\nIf you have a questions or what to suggest send a DM to the admin\nThank you!\nIf you agree all this, please react with ✅ to verify!')
+        .setDescription('환영합니다!\n본 서버는 그냥 자유롭게 아무 애기나 하셔도 되구요,\n2가지 규칙만 지키시면 됩니다.\n1.욕 금지\n2.기본 매너 지키기\n이것만 지키심 되구, 모든 서버는 자유롭게 이용하실수 있습니다\n따로 궁금하거나 뭘 만들어 달라는 제보는 관리자 한테 해주세요\n감사합니다\n이 모든 것을 동의하면 이 아래에 있는 ✅ 를 눌러주세요!\n\n\nWelcome!\nIn this server you can talk anything about it,\nbut you have to obey just 2 rules!\n1.No cursing\n2.Keep basic manners\nIf you obey this rules than you can chat in this room freely!\nIf you have a questions or what to suggest send a DM to the admin\nThank you!\nIf you agree all this, please react with ⭕ to verify!')
         .setColor(0x00ffff)
-        .setFooter("UCR(User Community Room)", client.guilds.get('632536162770354186').iconURL({
+        .setFooter("UCR(User Community Room)", client.guilds.cache.get(guildId).iconURL({
             dynamic: true
         }))
         .setTimestamp()
-    await client.channels.cache.get('657379262348787713').bulkDelete(2);
-    await client.channels.cache.get('657379262348787713').send(embed).then(async m => {
+    await client.channels.cache.get(rrId).bulkDelete(2);
+    await client.channels.cache.get(rrId).send(embed).then(async m => {
         messageId = m.id;
         await m.react('1️⃣');
         await m.react('2️⃣');
@@ -116,8 +119,10 @@ client.on('ready', async () => {
         await m.react('6️⃣');
     });
     
-    await client.channels.cache.get('657379262348787713').send(imbed).then(async x => {
+    await client.channels.cache.get(rrId).send(imbed).then(async x => {
         verifyId = x.id;
+        await x.react('✅');
+        await x.react('⭕');
     });
     await setInterval(async () => {
         /*
@@ -144,48 +149,58 @@ client.on('ready', async () => {
     }, 10000);
 });
 client.on('messageReactionAdd', async (react, user) => {
-    if (!client.guilds.cache.get('632536162770354186')) return;
+    if (!client.guilds.cache.get(guildId)) return;
     if (user.bot) return;
-    if (react.message.channel.id != '657379262348787713') {
-        if (react.emoji.name === '1️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(async r => r.name.startsWith('슷칼봇')));
-        } else if (react.emoji.name === '2️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(async r => r.name.startsWith('배추봇')));
-        } else if (react.emoji.name === '3️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(async r => r.name.startsWith('엔트리')));
-        } else if (react.emoji.name === '4️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(async r => r.name.startsWith('스크래치')));
-        } else if (react.emoji.name === '5️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(async r => r.name.startsWith('봇 마스터')));
-        } else if (react.emoji.name === '6️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(async r => r.name.startsWith('구독자')));
+    if (react.message.channel.id != rrId) return;
+        if (react.message.id == messageId) {
+            if (react.emoji.name === '1️⃣') {
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('슷칼봇')));
+            } else if (react.emoji.name === '2️⃣') {
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('배추봇')));
+            } else if (react.emoji.name === '3️⃣') {
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('엔트리')));
+            } else if (react.emoji.name === '4️⃣') {
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('스크래치')));
+            } else if (react.emoji.name === '5️⃣') {
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('봇 마스터')));
+            } else if (react.emoji.name === '6️⃣') {
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('구독자')));
+            }
+        } else if (react.message.id == verifyId) {
+            if (react.emoji.name === '✅') {
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('멤버')));
+            }
+            else if (react.emoji.name === '⭕') {
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('멤버')));
+                await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(r => r.name.startsWith('외국인')));
+            }
         }
-    } else if (react.message.id == verifyId) {
-        if (react.emoji.name === '✅') {
-            await react.message.guild.members.cache.get(user.id).roles.add(react.message.guild.roles.cache.find(async r => r.name.startsWith('멤버')));
-        }
-    }
 });
 client.on('messageReactionRemove', async (react, user) => {
-    if (!client.guilds.cache.get('632536162770354186')) return;
+    if (!client.guilds.cache.get(guildId)) return;
     if (user.bot) return;
-    if (react.message.channel.id != '657379262348787713') {
+    if (react.message.channel.id != rrId) return;
+    if (react.message.id == messageId) {
         if (react.emoji.name === '1️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(async r => r.name.startsWith('슷칼봇')));
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('슷칼봇')));
         } else if (react.emoji.name === '2️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(async r => r.name.startsWith('배추봇')));
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('배추봇')));
         } else if (react.emoji.name === '3️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(async r => r.name.startsWith('엔트리')));
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('엔트리')));
         } else if (react.emoji.name === '4️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(async r => r.name.startsWith('스크래치')));
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('스크래치')));
         } else if (react.emoji.name === '5️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(async r => r.name.startsWith('봇 마스터')));
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('봇 마스터')));
         } else if (react.emoji.name === '6️⃣') {
-            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(async r => r.name.startsWith('구독자')));
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('구독자')));
         }
     } else if (react.message.id == verifyId) {
         if (react.emoji.name === '✅') {
-            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(async r => r.name.startsWith('멤버')));
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('멤버')));
+        }
+        else if (react.emoji.name === '⭕') {
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('멤버')));
+            await react.message.guild.members.cache.get(user.id).roles.remove(react.message.guild.roles.cache.find(r => r.name.startsWith('외국인')));
         }
     }
 });
@@ -193,7 +208,8 @@ client.on('message', async message => {
     if (message.channel.type != 'text') return;
     if (message.author.bot) return;
     if (!message.content.startsWith('u!')) return;
-    //await message.channel.startTyping(1);
+    message.channel.startTyping(1);
+    if (!message.member.hasPermission('ADMINISTRATOR')) return await message.channel.send('이 봇의 모든 명령어는 서버 관리자 권한이 있어야 사용할 수 있습니다.\nOnly server admins can use this bot\'s commands.');
     const args = message.content.substr(2);
     if (args.startsWith('ban')) {
         const arg2 = args.split('$');
@@ -204,8 +220,8 @@ client.on('message', async message => {
         if (!member) return message.channel.send('유효하지 않은 멤버입니다.\nYou mentioned an invaild member.');
         await member.ban({
             reason: arg2[2]
-        }).then(async x => {
-            await message.cahnnel.send(x.tag + '을/를 차단했습니다.\nSuccessfully banned ' + x.tag + '.');
+        }).then(x => {
+            message.channel.send(x.user.tag + '을/를 차단했습니다.\nSuccessfully banned ' + x.user.tag + '.');
         });
     }
     else if (args.startsWith('kick')) {
@@ -215,10 +231,8 @@ client.on('message', async message => {
         if (!mention) return message.channel.send('추방할 유저를 멘션해주세요\nPlease mention who do you want to kick.');
         const member = message.guild.member(mention);
         if (!member) return message.channel.send('유효하지 않은 멤버입니다.\nYou mentioned an invaild member.');
-        await member.ban({
-            reason: arg2[2]
-        }).then(async x => {
-            await message.cahnnel.send(x.tag + '을/를 추방했습니다.\nSuccessfully kicked ' + x.tag + '.');
+        await member.kick(arg2[2]).then(x => {
+            message.channel.send(x.user.tag + '을/를 추방했습니다.\nSuccessfully kicked ' + x.user.tag + '.');
         });
     }
     else if (args === 'counter') {
@@ -234,7 +248,7 @@ client.on('message', async message => {
                 dynamic: true
             }))
             .setTimestamp();
-        const m = await message.channel.send(imbed);
+        let x = await message.channel.send(imbed);
         try {
             const code = arg.join(" ");
             let evaled = eval(code);
@@ -258,7 +272,7 @@ client.on('message', async message => {
                     dynamic: true
                 }))
                 .setTimestamp();
-            await m.edit(embed);
+            await x.edit(embed);
         } catch (err) {
             if (message.channel.type != "text") return;
             const embed = new Discord.MessageEmbed()
@@ -282,7 +296,7 @@ client.on('message', async message => {
                     dynamic: true
                 }))
                 .setTimestamp();
-            m.edit(embed2);
+            x.edit(embed2);
         }
     }
     else if (args.startsWith('mute')) {
@@ -302,7 +316,7 @@ client.on('message', async message => {
             }))
             .setTimestamp()
         let progress = await message.channel.send(embed);
-        mutemember.roles.cache.forEach(async x => {
+        mutemember.roles.cache.forEach(x => {
             const imbed = new Discord.MessageEmbed()
                 .setTitle(`${client.emojis.cache.find(x => x.name == 'loadingCirclebar')} 뮤트 진행 중 | Muting`)
                 .setColor(0xffff00)
@@ -312,30 +326,46 @@ client.on('message', async message => {
                     dynamic: true
                 }))
                 .setTimestamp()
-            await progress.edit(imbed);
-            await mutemember.roles.remove(x.id);
+            progress.edit(imbed);
+            mutemember.roles.remove(x.id);
         });
+        if (!message.guild.roles.cache.find(r => r.name.startsWith('뮤트'))) {
+            message.guild.roles.create({
+                data: {
+                    name: '뮤트 | Muted',
+                    color: 0xff0000
+                }
+            }).then(r2 => {
+                r2.setPermissions(0);
+                message.guild.channels.cache.forEach(x2 => {
+                    x2.createOverwrite(r2, {
+                        VIEW_CHANNEL: false
+                    });
+                });
+                message.guild.channels.create('뮤트용-채팅-Muted-Chatting').then(function (x3) {
+                    x3.createOverwrite(message.guild.roles.everyone, {
+                        VIEW_CHANNEL: false
+                    });
+                    x3.createOverwrite(r2, {
+                        VIEW_CHANNEL: true,
+                        SEND_MESSAGES: true,
+                        READ_MESSAGE_HISTORY: true
+                    });
+                });
+            });
+        }
         const ymbed = new Discord.MessageEmbed()
             .setTitle(`${client.emojis.cache.find(x => x.name == 'loadingCirclebar')} 뮤트 진행 중 | muting`)
             .setColor(0xffff00)
             .addField('뮤트할 유저 | User to mute', muteuser.tag)
-            .addField('진행 상황 | Status', `유저에게 역할 ${message.guild.roles.cache.find(r => r.name.startsWith('뮤트')).name} 을/를 추가하는 중 | Adding role ${message.guild.roles.cache.find(r => r.name.startsWith('뮤트')).name} to the user`)
+            .addField('진행 상황 | Status', `유저에게 역할 뮤트 | Muted를 추가하는 중 | Adding role 뮤트 | Muted to the user`)
             .setFooter(message.author.tag, message.author.avatarURL({
                 dynamic: true
             }))
             .setTimestamp()
         await progress.edit(ymbed);
-        if (!message.guild.roles.cache.find(r => r.name.startsWith('뮤트'))) {
-            message.guild.roles.create('뮤트 | Muted').then(async x => {
-                await x.setPermissions(0);
-            });
-            message.guild.channels.cache.forEach(async x => {
-                x.createOverwrite(message.guild.roles.cache.find(async x => x.name.startsWith('뮤트')), {
-                    VIEW_CHANNELS: false
-                });
-            });
-        }
-        await mutemember.roles.add(message.guild.roles.cache.find(async x => x.name.startsWith('뮤트')).id);
+
+        await mutemember.roles.add(message.guild.roles.cache.find(x => x.name.startsWith('뮤트')).id);
         const eembed = new Discord.MessageEmbed()
             .setTitle('뮤트 완료! | Muting completed!')
             .addField('뮤트된 유저 | Muted user', muteuser.tag)
@@ -422,14 +452,74 @@ client.on('message', async message => {
             .setTimestamp()
         await message.author.dmChannel.messages.cache.get(cleanId).edit(imbed);
     }
-    //await message.channel.stopTyping(true);
+    else if (args.startsWith('dm')) {
+        var sflit = args.split('$');
+        if (sflit.length != 2) return message.channel.send('전체디엠 메세지의 형식은 u!dm$<메세지 내용>이어야 합니다.\nEveryone dm message\'s format should be u!dm$<message to send>.');
+        const emved = new Discord.MessageEmbed()
+            .setTitle('UCR 디엠 공지 | UCR dm notice')
+            .setColor(0x00ffff)
+            .setFooter(message.author.id, message.author.avatarURL({
+                dynamic: true
+            }))
+            .setTimestamp()
+            .setDescription(sflit[1]);
+        message.guild.members.cache.forEach(function (m) {
+            if (!m.user.bot) {
+                m.user.send(emved);
+            }
+        });
+    }
+    else if (args.startsWith('ummute')) {
+        const muteuser = message.mentions.users.first();
+        if (!muteuser) return await message.channel.send('언뮤트할 유저를 멘션해주세요.\nPlease mention who do you want to unmute.');
+        const mutemember = message.guild.members.cache.get(muteuser.id);
+        if (!mutemember) return await message.channel.send('유효하지 않은 멤버입니다.\nYou mentioned an invaild member.');
+        const splited = args.split('$');
+        if (splited.length != 3) return await message.cahnnel.send('언뮤트 메세지는 u!mute$<유저 멘션>$<언뮤트 이유>의 형식이어야 합니다.\nUnmuting messages\' format should be u!unmute$<mention who do you want to unmute>$<reason for unmuting>.');
+        if (!mutemember.roles.cache.get(message.guild.roles.cache.find(x => x.name.startsWith('뮤트')).id)) return await message.channel.send('해당 유저는 뮤트되어있지 않습니다.\nThe user who you mentioned isn\'t muted.');
+        const embed = new Discord.MessageEmbed()
+            .setTitle(`${client.emojis.cache.find(x => x.name == 'loadingCirclebar')} 언뮤트 진행 중 | Unmuting`)
+            .setColor(0xffff00)
+            .addField('언뮤트할 유저 | User to unmute', muteuser.tag)
+            .addField('진행 상황 | Status', '유저의 모든 역할을 지우는 중 | Deleting all roles from the user')
+            .setFooter(message.author.tag, message.author.avatarURL({
+                dynamic: true
+            }))
+            .setTimestamp()
+        let progress = await message.channel.send(embed);
+        mutemember.roles.cache.forEach(x => {
+            const imbed = new Discord.MessageEmbed()
+                .setTitle(`${client.emojis.cache.find(x => x.name == 'loadingCirclebar')} 언뮤트 진행 중 | Unuting`)
+                .setColor(0xffff00)
+                .addField('언뮤트할 유저 | User to unmute', muteuser.tag)
+                .addField('진행 상황 | Status', `유저의 역할 ${x.name}을/를 지우는 중 | Deleting role ${x.name} from the user`)
+                .setFooter(message.author.tag, message.author.avatarURL({
+                    dynamic: true
+                }))
+                .setTimestamp()
+            progress.edit(imbed);
+            mutemember.roles.remove(x.id);
+        });
+        message.member.roles.remove(message.guild.roles.cache.find(x2 => x2.name.startsWith('뮤트')))
+        const eembed = new Discord.MessageEmbed()
+            .setTitle('언뮤트 완료! | Unmuting completed!')
+            .addField('언뮤트된 유저 | Unmuted user', muteuser.tag)
+            .addField('언뮤트 이유 | Reason for unmuting', splited[2])
+            .setColor(0x00ff00)
+            .setFooter(message.author.tag, message.author.avatarURL({
+                dynamic: true
+            }))
+            .setTimestamp()
+        await progress.edit(eembed);
+    }
+    message.channel.stopTyping(true);
 });
-client.on('guildMemberAdd', async member => {
-    await member.client.guilds.cache.get('632536162770354186').channels.cache.find(x => x.name.indexOf('인사') != 0).send(`${member} 님이 ${member.guild.name}에 오셨습니다.\n${member} just joined ${member.guild.name}.`);
-    await counter(member.client.guilds.cache.get('632536162770354186'));
+client.on('guildMemberAdd', member => {
+    member.guild.channels.cache.find(x => x.name.indexOf('인사') != -1).send(`${member} 님이 ${member.guild.name}에 오셨습니다.\n${member} just joined ${member.guild.name}.`);
+    counter(member.guild);
 });
-client.on('guildMemberRemove', async member => {
-    await member.client.guilds.cache.get('632536162770354186').channels.cache.find(x => x.name.indexOf('인사') != 0).send(`${member.tag} 님이 ${member.guild.name}을/를 나갔습니다.\n${member.user.tag} just left ${member.guild.name}.`);
-    await counter(member.client.guilds.cache.get('632536162770354186'));
+client.on('guildMemberRemove', member => {
+    member.guild.channels.cache.find(x => x.name.indexOf('인사') != -1).send(`${member.user.tag} 님이 ${member.guild.name}을/를 나갔습니다.\n${member.user.tag} just left ${member.guild.name}.`);
+    counter(member.guild);
 });
 client.login(process.env.TOKEN);
